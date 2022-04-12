@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -57,6 +58,24 @@ class AuthController extends Controller
         ];
 
         return response($response, 201);
+    }
+
+    function info(){
+        $userdata = User::where('id',Auth::user()->id)->get();
+        if($userdata->count() > 0 ){
+            $user = $userdata[0];
+            $data = [
+                'id' => $user->id,
+                'name' => $user->name,
+                'role' => $user->role
+            ];
+
+            $response = $data;
+        }else{
+            $response = ['message' => 'User not found'];
+        }
+
+        return response($response);
     }
 
     // logout user

@@ -23,14 +23,16 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
-Route::get('/todos', [TodosController::class, 'index']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::group(
     ['middleware' => ['auth:sanctum']], function(){
+        Route::get('/info', [AuthController::class, 'info']);
+        Route::get('/todos', [TodosController::class, 'index']);
+        Route::get('/todos/{id}', [TodosController::class, 'show']);
         Route::post('todos', [TodosController::class,'store']); 
-        Route::put('todos/{id}', [TodosController::class,'update']); 
+        Route::post('todos/{id}', [TodosController::class,'update']); 
         Route::delete('todos/{id}', [TodosController::class,'destroy']); 
         Route::post('/logout', [AuthController::class, 'logout']);
     }

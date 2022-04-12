@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Todos;
+use Illuminate\Support\Facades\Auth;
 
 class TodosController extends Controller
 {
@@ -27,9 +28,9 @@ class TodosController extends Controller
         }
 
         if($skip>0){
-            $allCoins = Todos::skip($skip)->take($take)->get();
+            $allCoins = Todos::where('user',Auth::user()->id)->skip($skip)->take($take)->orderBy('id','DESC')->get();
         }else{
-            $allCoins = Todos::take($take)->get();
+            $allCoins = Todos::where('user',Auth::user()->id)->take($take)->orderBy('id','DESC')->get();
         }
 
         return response()->json($allCoins);
@@ -43,21 +44,39 @@ class TodosController extends Controller
          $request->validate([
             'name' => 'required|unique:todos,name',
         ]);
+
+        $new = new Todos;
+        $new->name = $request->name;
+        $new->user = Auth::user()->id;
+        $new->save();
         
-        return Todos::create($request->all());
+        return $new;
 
     }
 
 
     public function show($id){
-        return Todos::find($id);
+        $todo = Todos::find($id);
+        if(Auth::user()->id != $todo->user){
+            return response()->json(['message' => 'Anauthorize']);
+        }
+
+        return $todo;
     }
 
     public function update(Request $request, $id){
+
+
+        $request->validate([
+            'name' => 'required',
+        ]);
+
+        // return $request->name;
     
-        $coin = Todos::find($id);
-        $coin->update($request->all());
-        return $coin;
+        $todo = Todos::find($id);
+        $todo->name = $request->name;
+        $todo->save();
+        return $todo;
     }
     public function destroy($id){
         return Todos::destroy($id);
