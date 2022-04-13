@@ -1,5 +1,6 @@
 <?php
 
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -10,10 +11,9 @@ class TodosController extends Controller
 {
     public function index(Request $request){
         
-        $page =1;
         $skip = 0;
-        $take = 10;
-        $item_per_page = 10;
+        $take = $item_per_page = 5;
+        $page = 1;
 
         if($request->has('page')){
             $page = $request->page;
@@ -21,19 +21,22 @@ class TodosController extends Controller
                 $page =1;
             }
 
-            $take = $page*$item_per_page;
+            $take = $item_per_page;
             if($page>1){
                 $skip = ($page-1)*$item_per_page;
             }
         }
-
+        
+        $total = Todos::where('user',Auth::user()->id)->get()->count();
+        $pages_count = ceil($total/$item_per_page);
+        
         if($skip>0){
             $allCoins = Todos::where('user',Auth::user()->id)->skip($skip)->take($take)->orderBy('id','DESC')->get();
         }else{
             $allCoins = Todos::where('user',Auth::user()->id)->take($take)->orderBy('id','DESC')->get();
         }
 
-        return response()->json($allCoins);
+        return response()->json(['result'=>$allCoins,'count'=>$total,'pages'=>$pages_count,'page'=>$page]);
 
 
     }
