@@ -92,6 +92,13 @@ class TodosController extends Controller
         return $todo;
     }
     public function destroy($id){
+
+        $todo = Todos::find($id);
+
+        if(Auth::user()->id != $todo->user){
+            return response()->json(['message'=>'Unauthorize request']);
+        }
+        
         return Todos::destroy($id);
     }
 
