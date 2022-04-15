@@ -70,14 +70,24 @@ class TodosController extends Controller
     public function update(Request $request, $id){
 
 
-        $request->validate([
-            'name' => 'required',
-        ]);
+        // $request->validate([
+        //     'name' => 'required',
+        // ]);
 
         // return $request->name;
     
         $todo = Todos::find($id);
-        $todo->name = $request->name;
+
+        if(Auth::user()->id != $todo->user){
+            return response()->json(['message'=>'Unauthorize request']);
+        }
+        if($request->has('name')){
+            $todo->name = $request->name;
+        }
+
+        if($request->has('status')){
+            $todo->status = $request->status;
+        }
         $todo->save();
         return $todo;
     }
