@@ -19,7 +19,6 @@ class AuthController extends Controller
             'password' => 'required|min:8|max:16|confirmed'
         ]);
 
-        // $userCount = User::get()->count();
         $user = User::create([
             'name' => $fields['name'],
             'email' => $fields['email'],
